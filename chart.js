@@ -1,4 +1,33 @@
-// svgChart 만들기
+function animateChartHeight() {
+  const chartItems = Array.from(document.querySelectorAll(".chart-item"));
+
+  chartItems.forEach((item) => {
+    const barChart = item.querySelector(".bar-chart");
+    const value = Number(barChart.getAttribute("data-value"));
+    let height = 0;
+
+    const interval = setInterval(() => {
+      if (height < value) {
+        height++;
+        item.style.height = `${height}px`;
+      } else {
+        clearInterval(interval);
+      }
+    }, 2);
+  });
+}
+
+function animateMidDot() {
+  const midDots = Array.from(document.querySelectorAll(".mid-dot"));
+
+  midDots.forEach((dot, index) => {
+    setTimeout(() => {
+      dot.style.opacity = 1;
+      dot.style.transition = "opacity 1s";
+    }, index * 300); // 1000ms 간격으로 middot이 나타납니다.
+  });
+}
+
 function generateSvgChart() {
   const chartContainer = document.querySelector(".chart-container");
   const width = chartContainer.offsetWidth;
@@ -32,6 +61,8 @@ function generateSvgChart() {
   path.setAttribute("stroke", "#000000");
   path.setAttribute("stroke-width", 2);
   path.setAttribute("fill", "none");
+
+  svg.style.opacity = 0;
   svg.appendChild(path);
 
   const pathData = dots.reduce((acc, dot, index) => {
@@ -60,7 +91,6 @@ function generateSvgChart() {
   path.setAttribute("d", `M${pathData}`);
 }
 
-// debounce
 function debounce(func, wait) {
   let timeout;
   return function delayedFunction(...params) {
@@ -77,4 +107,7 @@ const debouncedGenerateSvgChart = debounce(generateSvgChart, 200);
 
 window.addEventListener("resize", debouncedGenerateSvgChart);
 
-generateSvgChart();
+// 애니메이션을 순차적으로 실행합니다.
+animateChartHeight();
+setTimeout(animateMidDot, 1000);
+setTimeout(debouncedGenerateSvgChart, 2000);
